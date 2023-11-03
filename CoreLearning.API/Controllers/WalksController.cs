@@ -26,7 +26,7 @@ namespace CoreLearning.API.Controllers
         public async Task<IActionResult> Create([FromBody] AddWalksRequestDto addWalksRequestDto)
         {
 
-            
+
             //map dto to Domain model
             var domianModel = mapper.Map<Walk>(addWalksRequestDto);
 
@@ -38,18 +38,22 @@ namespace CoreLearning.API.Controllers
         }
         // get all the walks
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string? filterOn = null, [FromQuery] string? filterQuery = null,
+                [FromQuery] string? sortBy = null, [FromQuery] bool? isAscending = null, 
+                [FromQuery] int pageNumber = 1, [FromQuery]  int pageSize = 100000000)
         {
-            var walks = await repository.GetAllAsync();
+            var walks = await repository.GetAllAsync(filterOn, filterQuery, sortBy, isAscending ?? true,pageNumber,pageSize);
             return Ok(mapper.Map<List<WalkDto>>(walks));
         }
 
         //get walk by id
         [HttpGet]
         [Route("{Id:Guid}")]
-        public async Task<IActionResult> GetDetailsById([FromRoute] Guid Id) {
+        public async Task<IActionResult> GetDetailsById([FromRoute] Guid Id)
+        {
             var walkDomainModel = await repository.GetByIdAsync(Id);
-            if (walkDomainModel == null) {
+            if (walkDomainModel == null)
+            {
                 return NotFound();
 
             }
@@ -58,14 +62,14 @@ namespace CoreLearning.API.Controllers
         //update walk by Id
         [HttpPut]
         [Route("{Id:Guid}")]
-        public async Task<IActionResult> update([FromRoute] Guid Id,[FromBody] UpdateWalksRequestDto dto)
+        public async Task<IActionResult> update([FromRoute] Guid Id, [FromBody] UpdateWalksRequestDto dto)
         {
             if (!ModelState.IsValid) //   [ValidateModel] both are the same 
             {
                 return BadRequest(ModelState);
             }
 
-            var walkDomainModel = await repository.UpdateAsync(Id,mapper.Map<Walk>(dto)); 
+            var walkDomainModel = await repository.UpdateAsync(Id, mapper.Map<Walk>(dto));
             if (walkDomainModel == null)
             {
                 return NotFound();
