@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/CoreLearning/FileContentIndex
+/.vs/CoreLearning/v17
+/CoreLearning.API/bin
+/CoreLearning.API/obj
+*.suo
+/.vs/CoreLearning/v17/.suo
