@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CoreLearning.API.CustomActionFilter;
 using CoreLearning.API.Model.Domain;
 using CoreLearning.API.Model.DTO;
 using CoreLearning.API.Repositories;
@@ -21,10 +22,11 @@ namespace CoreLearning.API.Controllers
         }
         //create Walk  post method
         [HttpPost]
-
+        [ValidateModel]
         public async Task<IActionResult> Create([FromBody] AddWalksRequestDto addWalksRequestDto)
         {
 
+            
             //map dto to Domain model
             var domianModel = mapper.Map<Walk>(addWalksRequestDto);
 
@@ -58,8 +60,12 @@ namespace CoreLearning.API.Controllers
         [Route("{Id:Guid}")]
         public async Task<IActionResult> update([FromRoute] Guid Id,[FromBody] UpdateWalksRequestDto dto)
         {
+            if (!ModelState.IsValid) //   [ValidateModel] both are the same 
+            {
+                return BadRequest(ModelState);
+            }
 
-            var walkDomainModel = await repository.UpdateAsync(Id,mapper.Map<Walk>(dto));
+            var walkDomainModel = await repository.UpdateAsync(Id,mapper.Map<Walk>(dto)); 
             if (walkDomainModel == null)
             {
                 return NotFound();

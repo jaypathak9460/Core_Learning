@@ -1,5 +1,6 @@
 ﻿
 using AutoMapper;
+using CoreLearning.API.CustomActionFilter;
 using CoreLearning.API.Data;
 using CoreLearning.API.Model.Domain;
 using CoreLearning.API.Model.DTO;
@@ -17,10 +18,10 @@ namespace CoreLearning.API.Controllers
         private readonly IRegionRepository regionRepository;
         private readonly IMapper mapper;
 
-        public RegionsController(IMapper mappear, IRegionRepository regionRepository)
+        public RegionsController(IMapper map, IRegionRepository regionRepository)
         {
             this.regionRepository = regionRepository;
-            this.mapper = mapper;
+            this.mapper = map;
         }
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -42,26 +43,32 @@ namespace CoreLearning.API.Controllers
                 return NotFound();
             }
             var regionDTO = mapper.Map<RegionDto>(region);
-           
+
             return Ok(regionDTO);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] addRegionRequestDto dto)
         {
-
+            if (!ModelState.IsValid) //  [ValidateModel] both the conditions are the same 
+            {
+                return BadRequest(ModelState);
+            }  
+            
             // Convert DTo To Domain model
             var domainModel = mapper.Map<Region>(dto);
-            domainModel = await regionRepository.CreateAsync(domainModel);
-            //Convert domain model to DTO
-            var returndto = mapper.Map<RegionDto>(domainModel);
+                domainModel = await regionRepository.CreateAsync(domainModel);
+                //Convert domain model to DTO
+                var returndto = mapper.Map<RegionDto>(domainModel);
 
-            return CreatedAtAction(nameof(GetDetailById), new { id = domainModel.Id }, returndto);
-        }
+                return CreatedAtAction(nameof(GetDetailById), new { id = domainModel.Id }, returndto);
+            }
+           
 
         //update Region
         [HttpPut]
         [Route("{Id:Guid}")]
+        [ValidateModel]
         public async Task<IActionResult> Update([FromRoute] Guid Id, [FromBody] UpdateRegionRequest updateDto)
         {
             //Convert DTo to Domain Model
@@ -89,7 +96,7 @@ namespace CoreLearning.API.Controllers
 
             // Convert domain model to DTO
             var regionDTO = mapper.Map<RegionDto>(region);
-           
+
             return Ok(regionDTO);
         }
 
